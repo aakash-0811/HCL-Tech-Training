@@ -17,6 +17,13 @@ python src/cleandata.py
 python src/weatherforecast.py
 ```
 
+The forecast starts at `2026-01-01` by default. To forecast another 7-day
+period, pass a custom start date:
+
+```bash
+python src/weatherforecast.py --start-date 2027-01-01
+```
+
 The 7-day output includes `Temperature (C)`, `Wind Speed (km/hr)`, and
 `Rain chance (%)`.
 

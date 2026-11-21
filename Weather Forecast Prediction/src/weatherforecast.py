@@ -6,12 +6,26 @@ baseline, and forecasts the next 7 days.
 """
 import numpy as np
 import pandas as pd
+import argparse
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CLEANED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "cleaned_weather.csv"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+parser = argparse.ArgumentParser(description="Weather forecast prediction")
+parser.add_argument(
+    "--start-date",
+    default="2026-01-01",
+    help="First date of the 7-day forecast (YYYY-MM-DD)",
+)
+args = parser.parse_args()
+
+try:
+    FORECAST_START_DATE = pd.Timestamp(args.start_date)
+except (TypeError, ValueError) as exc:
+    parser.error(f"Invalid --start-date: {exc}")
 
 TARGET = "temperature"
 FEATURES = ["temperature", "humidity", "pressure", "wind_speed", "rainfall"]
@@ -111,7 +125,7 @@ def rain_probability(row, date):
 hist = df[FEATURES].copy()
 future = []
 for step in range(7):
-    next_date = hist.index[-1] + pd.Timedelta(days=1)
+    next_date = FORECAST_START_DATE + pd.Timedelta(days=step)
     row = hist.copy()
     row.loc[next_date] = np.nan                    # placeholder for features
     feats = make_features(row).iloc[[-1]]
